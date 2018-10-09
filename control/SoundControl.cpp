@@ -63,16 +63,20 @@ void release()
 
 void setMute(const bool mute)
 {
-  std::cout << "setMute: " << std::boolalpha << mute << std::endl;
+  auto result = endpointVolume->SetMute(mute, nullptr);
+  std::cout << "setMute: " << std::boolalpha << mute << "::" << result << std::endl;
 }
 
 bool isMuted()
 {
-  std::cout << "isMuted: " << std::endl;
-  return false;
+  BOOL isMuted = false;
+  endpointVolume->GetMute(&isMuted);
+  std::cout << "isMuted: " << std::boolalpha << isMuted << std::endl;
+
+  return isMuted;
 }
 
-void setVolume(uint8_t volume)
+void setVolume(const uint8_t volume)
 {
   const float value = static_cast<float>(volume) * 0.01f;
   auto result = endpointVolume->SetMasterVolumeLevelScalar(value, nullptr);
@@ -90,26 +94,34 @@ uint8_t getVolume()
 
 void next()
 {
+  SendKeyInput(VK_MEDIA_NEXT_TRACK);
   std::cout << "next: " << std::endl;
 }
 
 void prev()
 {
+  SendKeyInput(VK_MEDIA_PREV_TRACK);
   std::cout << "prev: " << std::endl;
 }
 
-void play()
+void playpause()
 {
+  SendKeyInput(VK_MEDIA_PLAY_PAUSE);
   std::cout << "play: " << std::endl;
-}
-
-void pause()
-{
-  std::cout << "pause: " << std::endl;
 }
 
 void stop()
 {
+  SendKeyInput(VK_MEDIA_STOP);
   std::cout << "stop: " << std::endl;
 }
 
+void SendKeyInput(const uint16_t& key)
+{
+  INPUT input;
+  memset(&input, 0, sizeof(INPUT));
+
+  input.type = INPUT_KEYBOARD;
+  input.ki.wVk = key;
+  SendInput(1, &input, sizeof(INPUT));
+}
